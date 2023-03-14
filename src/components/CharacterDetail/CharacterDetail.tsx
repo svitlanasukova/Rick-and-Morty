@@ -12,7 +12,7 @@ const CharacterDetail: React.FC<{ character: CharacterType }> = ({
 	const navigate = useNavigate();
 
 	const goBackHandler = () => {
-		navigate('/');
+		navigate('/Rick-and-Morty');
 	};
 
 	return (

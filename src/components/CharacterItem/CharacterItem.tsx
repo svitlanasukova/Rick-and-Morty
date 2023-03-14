@@ -9,7 +9,7 @@ const CharacterItem: React.FC<{ character: CharacterType }> = React.memo(
 		// console.log('CharacterItem component render');
 		const navigate = useNavigate();
 		const clickHandler = () => {
-			navigate('/' + character.id);
+			navigate('/Rick-and-Morty/' + character.id);
 		};
 		return (
 			<div className={classes['character-item']} onClick={clickHandler}>
