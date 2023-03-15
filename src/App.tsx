@@ -1,18 +1,15 @@
 import React from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import CharacterDetailPage, {
-	loader as characterLoader,
-} from './pages/CharacterDetail';
-import CharactersPage, { loader as charactersLoader } from './pages/Characters';
-import Error from './pages/Error';
+import CharacterDetailPage from 'pages/CharacterDetail';
+import { loader as characterLoader } from 'api/characterDetailLoader';
+import CharactersPage from 'pages/Characters';
+import Error from 'pages/Error';
 
 const router = createBrowserRouter([
 	{
 		path: '/Rick-and-Morty',
 		index: true,
 		element: <CharactersPage />,
-		errorElement: <Error />,
-		loader: charactersLoader,
 	},
 	{
 		path: '/Rick-and-Morty/:characterId',

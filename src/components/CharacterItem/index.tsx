@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CharacterType } from '../../models/character.type';
+import { CharacterType } from 'types/character';
 
-import classes from './CharacterItem.module.css';
+import styles from './styles.module.scss';
 
 const CharacterItem: React.FC<{ character: CharacterType }> = React.memo(
 	({ character }) => {
@@ -12,15 +12,13 @@ const CharacterItem: React.FC<{ character: CharacterType }> = React.memo(
 			navigate('/Rick-and-Morty/' + character.id);
 		};
 		return (
-			<div className={classes['character-item']} onClick={clickHandler}>
-				<div className={classes['character-item__image']}>
+			<div className={styles.character} onClick={clickHandler}>
+				<div className={styles.image}>
 					<img src={character.image} alt={character.name} />
 				</div>
-				<div className={classes['character-item__content']}>
-					<h2 className={classes['character-item__name']}>{character.name}</h2>
-					<div className={classes['character-item__gender']}>
-						{character.gender}
-					</div>
+				<div className={styles.content}>
+					<h2 className={styles.name}>{character.name}</h2>
+					<div className={styles.gender}>{character.gender}</div>
 				</div>
 			</div>
 		);

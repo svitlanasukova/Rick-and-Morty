@@ -1,100 +1,138 @@
-import React, { useCallback, useState } from 'react';
-import { json, useLoaderData } from 'react-router-dom';
-import ChractersList from '../components/CharactersList/ChractersList';
-import Filter from '../components/Filter/Filter';
-import { CharacterType } from '../models/character.type';
+import React, {
+	ChangeEvent,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from 'react';
+import { useSearchParams } from 'react-router-dom';
+import ChractersList from 'components/CharactersList';
 
-import logo from '../logo.png';
+import logo from 'assets/images/logo.png';
+import searchIcon from 'assets/images/icons/search.svg';
+import { sortByObjName } from 'util/sort';
+import Pagination from 'components/Pagination/Index';
+
+let firstRender: boolean = true;
 
 const CharactersPage = React.memo(() => {
-	console.log('CharactersPage render');
-	const fetchedCharacters = useLoaderData() as CharacterType[];
+	// console.log('CharactersPage render');
 
-	let initialCharacters = fetchedCharacters;
-
-	const filteredText = localStorage.getItem('filteredText');
-	const filterCharacters = useCallback(
-		(text: string, characters: CharacterType[]) =>
-			characters?.filter(character => {
-				const name = character.name.toLowerCase();
-				return name.includes(text.toLowerCase());
-			}),
-		[],
+	const [filterParams, setFilterParams] = useSearchParams();
+	const filterValueFromParams = filterParams.get('filter');
+	const initialFilterValue = useMemo(
+		() => (filterValueFromParams ? filterValueFromParams : ''),
+		[filterValueFromParams],
 	);
 
-	if (filteredText) {
-		const filteredCharacters = filterCharacters(
-			filteredText,
-			fetchedCharacters,
-		);
-		if (
-			filteredCharacters &&
-			filteredCharacters?.length > 0 &&
-			filteredText !== ''
-		) {
-			initialCharacters = filteredCharacters;
-		} else if (filteredText !== '' && filteredCharacters?.length === 0) {
-			initialCharacters = [];
-		}
-	}
+	const [filterValue, setFilterValue] = useState(initialFilterValue);
+	const [characters, setCharacters] = useState([]);
+	const [loading, setLoading] = useState(false);
+	const [currentPage, setCurrentPage] = useState(1);
+	const [charactersPerPage] = useState(8);
 
-	const [characters, setCharacters] =
-		useState<CharacterType[]>(initialCharacters);
-
-	const filterHandler = useCallback(
-		(text: string) => {
-			const filteredCharacters = filterCharacters(text, characters);
-
-			if (filteredCharacters && filteredCharacters?.length > 0 && text !== '') {
-				if (text.length > 1) {
-					setCharacters(filteredCharacters);
-				}
-			} else if (text !== '' && filteredCharacters?.length === 0) {
+	const fetchCharacters = useCallback(async () => {
+		setLoading(true);
+		const response = await fetch('https://rickandmortyapi.com/api/character');
+		if (!response.ok) {
+			if (response.status === 404) {
 				setCharacters([]);
-			} else {
-				setCharacters(fetchedCharacters);
 			}
-		},
-		[characters, fetchedCharacters, filterCharacters],
+		} else {
+			const resData = await response.json();
+			const sortedData = resData.results.sort(sortByObjName);
+			setCharacters(sortedData);
+		}
+		setCurrentPage(1);
+		setLoading(false);
+	}, []);
+
+	const fetchFilteredCharacters = useCallback(async () => {
+		setLoading(true);
+		const response = await fetch(
+			'https://rickandmortyapi.com/api/character/?name=' + filterValue,
+		);
+
+		if (!response.ok) {
+			if (response.status === 404) {
+				setCharacters([]);
+			}
+		} else {
+			const resData = await response.json();
+			const sortedData = resData.results.sort(sortByObjName);
+			setCharacters(sortedData);
+		}
+		setCurrentPage(1);
+		setLoading(false);
+	}, [filterValue]);
+
+	useEffect(() => {
+		if (filterValue) {
+			if (firstRender) {
+				fetchFilteredCharacters();
+				firstRender = false;
+			} else {
+				const timer = setTimeout(() => {
+					fetchFilteredCharacters();
+				}, 500);
+
+				return () => {
+					clearTimeout(timer);
+				};
+			}
+		} else {
+			fetchCharacters();
+		}
+	}, [filterValue, fetchFilteredCharacters, fetchCharacters]);
+
+	const filterHandler = (event: ChangeEvent<HTMLInputElement>) => {
+		const value = event.target.value;
+		setFilterValue(value);
+		if (value) {
+			setFilterParams({ filter: value });
+		} else {
+			setFilterParams();
+		}
+	};
+
+	// Get current characters
+	const indexOfLastCharacter = currentPage * charactersPerPage;
+	const indexOfFirstCharacter = indexOfLastCharacter - charactersPerPage;
+	const currentCharacters = characters.slice(
+		indexOfFirstCharacter,
+		indexOfLastCharacter,
 	);
+
+	// Change page
+	const paginateHandler = (pageNumber: number) => {
+		setCurrentPage(pageNumber);
+	};
 
 	return (
 		<div className='characters'>
 			<img src={logo} alt='Logo' className='logo' />
-			<Filter onFilter={filterHandler} />
-			{characters.length ? (
-				<ChractersList characters={characters} />
-			) : (
-				<p>Nothing found.</p>
+			<div className='filter'>
+				<img src={searchIcon} alt='filter' />
+				<input
+					type='text'
+					placeholder='Filter by name...'
+					value={filterValue}
+					onChange={filterHandler}
+				/>
+			</div>
+			{characters.length > 0 && (
+				<ChractersList characters={currentCharacters} />
 			)}
+			{characters.length === 0 && !firstRender ? <p>Nothing found.</p> : ''}
+			{loading && <p>Loading...</p>}
+			<Pagination
+				charactersPerPage={charactersPerPage}
+				totalCharacters={characters.length}
+				paginate={paginateHandler}
+				currentPage={currentPage}
+			/>
 		</div>
 	);
 });
 
 export default CharactersPage;
-
-export const loader = async () => {
-	const response = await fetch('https://rickandmortyapi.com/api/character');
-
-	if (!response.ok) {
-		throw json({ message: 'Could not fetch characters.' }, { status: 500 });
-	} else {
-		const resData = await response.json();
-		// Sort by character name
-		const sortedData = resData.results.sort(
-			(a: { name: string }, b: { name: string }) => {
-				let nameA = a.name.toLowerCase(),
-					nameB = b.name.toLowerCase();
-
-				if (nameA < nameB) {
-					return -1;
-				}
-				if (nameA > nameB) {
-					return 1;
-				}
-				return 0;
-			},
-		);
-		return sortedData;
-	}
-};

@@ -1,31 +1,31 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CharacterType } from '../../models/character.type';
+import { CharacterType } from 'types/character';
 
-import classes from './CharacterDetail.module.css';
-import arrowBack from './arrow-back.svg';
+import styles from './styles.module.scss';
+import arrowBack from 'assets/images/icons/arrow-back.svg';
 
 const CharacterDetail: React.FC<{ character: CharacterType }> = ({
 	character,
 }) => {
-	console.log('CharacterDetail component render');
+	// console.log('CharacterDetail component render');
 	const navigate = useNavigate();
 
 	const goBackHandler = () => {
-		navigate('/Rick-and-Morty');
+		navigate(-1);
 	};
 
 	return (
-		<div className={classes['character-detail']}>
-			<div className={classes['go-back']} onClick={goBackHandler}>
+		<div className={styles.detail}>
+			<div className={styles.goBack} onClick={goBackHandler}>
 				<img src={arrowBack} alt='Go back' />
 				GO BACK
 			</div>
-			<div className={classes['character-detail__image']}>
+			<div className={styles.image}>
 				<img src={character.image} alt={character.name} />
 			</div>
-			<h1 className={classes['character-detail__name']}>{character.name}</h1>
-			<div className={classes['character-detail__info']}>
+			<h1 className={styles.name}>{character.name}</h1>
+			<div className={styles.info}>
 				<h2>Informations</h2>
 				<ul>
 					<li>

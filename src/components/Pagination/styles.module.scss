@@ -1,0 +1,29 @@
+.pagination {
+	display: flex;
+	justify-content: center;
+	margin-top: 2rem;
+	ul {
+		display: flex;
+		justify-content: center;
+		gap: 0.5rem;
+		list-style: none;
+		flex-wrap: wrap;
+		li {
+			cursor: pointer;
+			width: 2rem;
+			height: 2rem;
+			border: 1px solid #ccc;
+			border-radius: 4px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			color: rgba(0, 0, 0, 0.5);
+			transition: all 0.3s ease-out;
+			&.active,
+			&:hover {
+				color: #000;
+				border-color: #000;
+			}
+		}
+	}
+}

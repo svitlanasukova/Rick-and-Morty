@@ -1,14 +1,14 @@
 import React from 'react';
-import CharacterItem from '../CharacterItem/CharacterItem';
-import { CharacterType } from '../../models/character.type';
+import CharacterItem from '../CharacterItem';
+import { CharacterType } from 'types/character';
 
-import classes from './CharactersList.module.css';
+import styles from './styles.module.scss';
 
 const ChractersList: React.FC<{ characters: CharacterType[] }> = React.memo(
 	({ characters }) => {
-		console.log('ChractersList component render');
+		// console.log('ChractersList component render');
 		return (
-			<div className={classes['characters-list']}>
+			<div className={styles.characters}>
 				{characters.map(character => (
 					<CharacterItem character={character} key={character.id} />
 				))}
