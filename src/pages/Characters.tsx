@@ -8,8 +8,7 @@ import logo from '../logo.png';
 
 const CharactersPage = React.memo(() => {
 	console.log('CharactersPage render');
-	const data = useLoaderData() as Object;
-	const fetchedCharacters = data as CharacterType[];
+	const fetchedCharacters = useLoaderData() as CharacterType[];
 
 	let initialCharacters = fetchedCharacters;
 
@@ -44,7 +43,6 @@ const CharactersPage = React.memo(() => {
 
 	const filterHandler = useCallback(
 		(text: string) => {
-			setCharacters(fetchedCharacters);
 			const filteredCharacters = filterCharacters(text, characters);
 
 			if (filteredCharacters && filteredCharacters?.length > 0 && text !== '') {
@@ -53,6 +51,8 @@ const CharactersPage = React.memo(() => {
 				}
 			} else if (text !== '' && filteredCharacters?.length === 0) {
 				setCharacters([]);
+			} else {
+				setCharacters(fetchedCharacters);
 			}
 		},
 		[characters, fetchedCharacters, filterCharacters],
