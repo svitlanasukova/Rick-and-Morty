@@ -16,7 +16,7 @@ import Pagination from 'components/Pagination/Index';
 let firstRender: boolean = true;
 
 const CharactersPage = React.memo(() => {
-	// console.log('CharactersPage render');
+	console.log('CharactersPage render');
 
 	const [filterParams, setFilterParams] = useSearchParams();
 	const filterValueFromParams = filterParams.get('filter');
@@ -123,7 +123,11 @@ const CharactersPage = React.memo(() => {
 			{characters.length > 0 && (
 				<ChractersList characters={currentCharacters} />
 			)}
-			{characters.length === 0 && !firstRender ? <p>Nothing found.</p> : ''}
+			{characters.length === 0 && !firstRender && !loading ? (
+				<p>Nothing found.</p>
+			) : (
+				''
+			)}
 			{loading && <p>Loading...</p>}
 			<Pagination
 				charactersPerPage={charactersPerPage}
