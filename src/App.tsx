@@ -1,9 +1,9 @@
 import React from 'react';
 import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import CharacterDetailPage from 'pages/CharacterDetail';
+import CharacterDetailPage from 'pages/CharacterDetailPage';
 import { loader as characterLoader } from 'api/characterDetailLoader';
-import CharactersPage from 'pages/Characters';
-import Error from 'pages/Error';
+import CharactersPage from 'pages/CharactersPage';
+import Error from 'pages/ErrorPage';
 
 const router = createBrowserRouter([
 	{
